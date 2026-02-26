@@ -1,10 +1,8 @@
 #!/bin/sh
 
 SESSION1='rtvision-app'
-SESSION2='php'
 BASE_REPO_DIR=~/monorepo
 OPEN_SOURCE_DIR=~/open-source
-PHP_HOME=~/apache-php-apps
 
 # set up tmux
 tmux start-server
@@ -17,15 +15,16 @@ tmux split-window -v -l 40% -c $BASE_REPO_DIR
 tmux select-pane -t ui.right
 
 tmux new-window -t $SESSION1:2 -n 'docker' -c $BASE_REPO_DIR
+tmux new-window -t $SESSION1:3 -n 'notes' -c '~'
 
-tmux new-window -t $SESSION1:3 -n 'add-in' -c $BASE_REPO_DIR/apps/add-in-word-excel
+tmux new-window -t $SESSION1:4 -n 'add-in' -c $BASE_REPO_DIR/apps/add-in-word-excel
 tmux split-window -h -l 75% -t add-in -c $BASE_REPO_DIR/apps/add-in-word-excel
 tmux select-pane -t add-in.right
 
-tmux new-window -t $SESSION1:4 -n 'aws-infrastructure' -c $BASE_REPO_DIR
-tmux new-window -t $SESSION1:5 -n 'db' -c $BASE_REPO_DIR
+tmux new-window -t $SESSION1:5 -n 'aws-infrastructure' -c $BASE_REPO_DIR
+tmux new-window -t $SESSION1:6 -n 'db' -c $BASE_REPO_DIR
 
-tmux new-window -t $SESSION1:6 -n 'open-source' -c $OPEN_SOURCE_DIR
+tmux new-window -t $SESSION1:7 -n 'open-source' -c $OPEN_SOURCE_DIR
 tmux split-window -h -l 70% -t open-source -c $OPEN_SOURCE_DIR
 tmux split-window -v -l 5% -t open-source.left -c $OPEN_SOURCE_DIR
 tmux select-pane -t open-source.right
@@ -43,25 +42,5 @@ tmux send-keys -t open-source.bottom-left 'ssh -L 3333:github.com:22 ssh -N' # D
 # go to 3rd window so it is marked as the previous window and accessed via the back key
 tmux select-window -t $SESSION1:docker
 tmux select-window -t $SESSION1:ui
-
-# start other sessions
-tmux new-session -d -s $SESSION2 -n 'php-apps' -x "$(tput cols)" -y "$(tput lines)" -c $PHP_HOME/apps
-tmux split-window -h -l 75% -t php-apps -c $PHP_HOME/apps
-tmux split-window -v -l 30% -t php-apps.left -c $PHP_HOME/apps
-tmux select-pane -t php-apps.right
-
-tmux new-window -t $SESSION2:2 -n 'docker' -c $PHP_HOME
-
-tmux new-window -t $SESSION2:3 -n 'db' -c $PHP_HOME
-
-tmux new-window -t $SESSION2:4 -n 'customer' -c $PHP_HOME
-tmux send-keys -t customer 'ssh bastion'
-
-sleep 1
-tmux send-keys -t $SESSION2:docker 'make'
-
-tmux send-keys -t $SESSION2:db 'psql -U postgres -h localhost -p 5433'
-
-tmux select-window -t $SESSION2:php-apps
 
 tmux attach-session -t $SESSION1

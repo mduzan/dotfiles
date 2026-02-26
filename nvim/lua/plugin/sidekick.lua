@@ -8,6 +8,11 @@ return {
 				enabled = true
 			},
 		},
+		copilot = {
+			status = {
+				enabled = false
+			}
+		}
 	},
 	keys = {
 		{

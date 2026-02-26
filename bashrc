@@ -75,7 +75,7 @@ source_dir ~/.bash.d/local/after
 if [[ -f ~/.secrets ]]; then
 	source ~/.secrets
 fi
-
+test -f ~/.secrets && source ~/.secrets
 # ssh aliases
 alias ssh-vm='ssh -A kalvens@2620:9d:4000:72:136c:fa8:54b:9be1'
 alias ssh-ws='ssh kalvens@192.168.1.72'
@@ -157,7 +157,7 @@ export LAUNCH_EDITOR="$HOME/launch_editor"
 alias nvim-server="nvim --listen ~/.cache/nvim/server.pipe"
 
 # pnpm
-export PNPM_HOME="/home/kalvens/.local/share/pnpm"
+export PNPM_HOME="/home/maxd/.local/share/pnpm"
 case ":$PATH:" in
 *":$PNPM_HOME:"*) ;;
 *) export PATH="$PNPM_HOME:$PATH" ;;
