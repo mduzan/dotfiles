@@ -83,10 +83,6 @@ install_home() {
 				curl -fsSL https://get.pnpm.io/install.sh | sh -
 			fi
 
-			if ! which prettierd &>/dev/null; then
-				echo 'Adding prettierd for ts/js/vue neovim formatting'
-				pnpm install -g @fsouza/prettierd
-			fi
 			if ! which cspell &>/dev/null; then
 				echo 'Adding cspell for code spelling checking'
 				pnpm install -g cspell
