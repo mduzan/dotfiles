@@ -271,6 +271,7 @@ apply_component_selection() {
 				if ! which pnpm &>/dev/null; then
 					echo 'Installing pnpm'
 					curl -fsSL https://get.pnpm.io/install.sh | sh -
+					source ~/.bashrc
 				fi
 
 				if ! which cspell &>/dev/null; then
@@ -280,6 +281,10 @@ apply_component_selection() {
 
 				if ! which shfmt &>/dev/null; then
 					echo 'package shfmt not found, install using local OS package manager for bash formatting'
+				fi
+
+				if ! which tree-sitter &>/dev/null; then
+					echo 'package tree-sitter not found, install using local OS package manager for neovim treesitter parser installs'
 				fi
 
 				if ! which cargo &>/dev/null; then

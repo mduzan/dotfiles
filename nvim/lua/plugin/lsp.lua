@@ -15,7 +15,7 @@ return {
 				ensure_installed = {
 					'vue_ls',
 					'copilot',
-					'vtsls',
+					'tsgo',
 					'jsonls',
 					'lua_ls',
 					'bashls',
@@ -24,7 +24,10 @@ return {
 					'tsgo',
 					'oxfmt',
 					'eslint',
-				}
+				},
+				automatic_enable = {
+					exclude = { 'vtsls' },
+				},
 			})
 
 			local oxlintBusyBuffers = {}
@@ -267,10 +270,12 @@ return {
 					vim.keymap.set('n', '<leader>vws', vim.lsp.buf.workspace_symbol, opts)
 					vim.keymap.set('n', '<leader>vd', vim.diagnostic.open_float,
 						{ buffer = event.buf, desc = 'Show diagnostics for the currently hovered text' })
-					vim.keymap.set('n', '[d', vim.diagnostic.goto_next,
-						{ buffer = event.buf, desc = 'Go to next diagnostic' })
-					vim.keymap.set('n', ']d', vim.diagnostic.goto_prev,
-						{ buffer = event.buf, desc = 'Go to previous diagnostic' })
+					vim.keymap.set('n', '[d', function()
+						vim.diagnostic.jump({ count = 1, float = true })
+					end, { buffer = event.buf, desc = 'Go to next diagnostic' })
+					vim.keymap.set('n', ']d', function()
+						vim.diagnostic.jump({ count = -1, float = true })
+					end, { buffer = event.buf, desc = 'Go to previous diagnostic' })
 					vim.keymap.set('n', '<leader>vca', vim.lsp.buf.code_action,
 						{ buffer = event.buf, desc = 'Show code actions for the currently hovered text' })
 					vim.keymap.set('n', '<leader>vrr', vim.lsp.buf.references, opts)
@@ -372,6 +377,7 @@ return {
 			vim.lsp.enable({
 				'vue_ls',
 				'vtsls',
+				'tsgo',
 				'lua_ls',
 				'bashls',
 				'jsonls',
@@ -380,7 +386,6 @@ return {
 				'oxlint',
 				'oxfmt',
 				'eslint',
-				'tsgo'
 			});
 		end
 	},
@@ -435,7 +440,7 @@ return {
 		lazy = false,
 		config = function()
 			local target = nil;
-			if string.find(vim.loop.cwd(), 'windows') then
+			if string.find(vim.uv.cwd(), 'windows') then
 				target = 'x86_64-pc-windows-gnu';
 			end
 			vim.g.rustaceanvim = {

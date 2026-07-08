@@ -68,11 +68,58 @@ return {
 	-- optional: provides snippets for the snippet source
 	dependencies = {
 		'rafamadriz/friendly-snippets',
-		"fang2hou/blink-copilot"
+		'fang2hou/blink-copilot',
+		'saghen/blink.lib'
 	},
+	build = function()
+		require('blink.cmp').build():pwait()
+	end,
+	init = function()
+		vim.keymap.set('i', '<Tab>', function()
+			local cmp = require('blink.cmp')
+			if vim.fn.getcmdtype() == '/' or vim.fn.getcmdtype() == '?' then
+				return '<Tab>'
+			end
+			if cmp.is_visible() then
+				cmp.select_next()
+				return '<Ignore>'
+			end
+			if vim.snippet.active({ direction = 1 }) then
+				return '<Cmd>lua vim.snippet.jump(1)<CR>'
+			end
+			local ok, sidekick = pcall(require, 'sidekick')
+			if ok and type(sidekick.nes_jump_or_apply) == 'function' and sidekick.nes_jump_or_apply() then
+				return '<Ignore>'
+			end
+			return '<Tab>'
+		end, {
+			desc = 'Blink next completion, snippet jump, or tab',
+			expr = true,
+			silent = true,
+		})
+
+		vim.keymap.set('i', '<S-Tab>', function()
+			local cmp = require('blink.cmp')
+			if vim.fn.getcmdtype() == '/' or vim.fn.getcmdtype() == '?' then
+				return '<S-Tab>'
+			end
+			if cmp.is_visible() then
+				cmp.select_prev()
+				return '<Ignore>'
+			end
+			if vim.snippet.active({ direction = -1 }) then
+				return '<Cmd>lua vim.snippet.jump(-1)<CR>'
+			end
+			return '<S-Tab>'
+		end, {
+			desc = 'Blink previous completion, snippet jump, or shift-tab',
+			expr = true,
+			silent = true,
+		})
+	end,
 
 	-- use a release tag to download pre-built binaries
-	version = '1.*',
+	version = '2.*',
 	-- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
 	-- build = 'cargo build --release',
 	-- If you use nix, you can build from source using latest nightly rust with:
@@ -95,17 +142,12 @@ return {
 		-- See :h blink-cmp-config-keymap for defining your own keymap
 		keymap = {
 			preset = 'enter',
-			["<Tab>"] = {
-				"select_next",
-				function() -- sidekick next edit suggestion
-					return require("sidekick").nes_jump_or_apply()
-				end,
-				-- function() -- if you are using Neovim's native inline completions
-				-- return vim.lsp.inline_completion.get()
-				-- end,
-				"fallback",
+			["<Tab>"] = { 'select_next', 'snippet_forward', 'fallback' },
+			['<S-Tab>'] = {
+				'select_prev',
+				'snippet_backward',
+				'fallback'
 			},
-			['<S-Tab>'] = { 'select_prev', 'fallback' },
 			["<C-s>"] = {
 				"snippet_forward",
 				"fallback",
@@ -153,19 +195,19 @@ return {
 			},
 			ghost_text = { enabled = true },
 		},
-
+		cmdline = { enabled = false },
 		-- Default list of enabled providers defined so that you can extend it
 		-- elsewhere in your config, without redefining it, due to `opts_extend`
-			sources = {
-				default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
-				providers = {
-					lsp = {
-						name = "LSP",
-						score_offset = 20,
-						transform_items = function(_, items)
-							return dedupe_lsp_items(items)
-						end,
-					},
+		sources = {
+			default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
+			providers = {
+				lsp = {
+					name = "LSP",
+					score_offset = 20,
+					transform_items = function(_, items)
+						return dedupe_lsp_items(items)
+					end,
+				},
 				buffer = {
 					name = "Buffer",
 					score_offset = -10,
